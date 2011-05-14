@@ -1,0 +1,25 @@
+# Maintainer: Michal Gawronski <dinth1906@gmail.com>
+pkgname=jalli
+pkgver=0.3.0b1
+pkgrel=1
+pkgdesc="Opensource chatlog converter supporting Pidgin, Empathy and mcabber"
+arch=('i686' 'x86_64')
+url="http://jalli.berlios.de"
+license=('unknown')
+depends=('')
+makedepends=('' '')
+provides=()
+conflicts=()
+replaces=()
+backup=()
+groups=()
+options=()
+install=
+source=("http://download2.berlios.de/jalli/Jalli-${pkgver}.tar.gz")
+noextract=()
+md5sums=('484e4faa6df263953bce86c4b6b856cf')
+
+build() {
+ cd $srcdir
+ 
+}

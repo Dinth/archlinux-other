@@ -1,0 +1,14 @@
+--- connman-0.52/src/connman-dbus.conf	2010-04-14 12:04:34.000000000 +0200
++++ connman-0.52/src/connman-dbus.conf.new	2010-05-05 00:11:26.000000000 +0200
+@@ -7,6 +7,11 @@
+         <allow send_interface="org.moblin.connman.Agent"/>
+         <allow send_interface="org.moblin.connman.Counter"/>
+     </policy>
++  <policy group="network">
++       <allow send_destination="org.moblin.connman"/>
++       <allow send_interface="org.moblin.connman.Agent"/>
++       <allow send_interface="org.moblin.connman.Counter"/>
++   </policy>
+     <policy at_console="true">
+         <allow send_destination="org.moblin.connman"/>
+     </policy>

@@ -1,0 +1,33 @@
+# Contributor: Michal Gawronski <dinth1906 at gmail dot com>
+
+pkgname=tome3
+pkgver=3.0.0alpha19
+pkgrel=1
+pkgdesc="Is a fantasy adventure game, based on the works of J.R.R. Tolkien. It is a game that emphasizes intricate, challenging, and varied gameplay over graphics. Hundreds of different monsters in randomly-generated, unpredictable dungeons will strive to slay you by various means, and you counter - if you survive - by developing the skills of your choice and wielding mighty artifacts."
+arch=('i686' 'x86_64')
+url="http://www.t-o-m-e.net"
+license=('GPL v2')
+depends=(ncurses libx11 sdl sdl_gfx)
+source=('http://www.t-o-m-e.net/dl/src/tome-300alpha19-src.tar.bz2')
+md5sums=('7a993d72639da0f797a9e129b0b227de')
+
+build() {
+    cd $srcdir/tome-300alpha19-src/src
+    sed -e 's@PREFIX ?= /usr/local@PREFIX ?= /usr@;s@LIBDIR = $(PREFIX)/games/$(TOMENAME)/@LIBDIR = $(PREFIX)/share/$(TOMENAME)/@' ./makefile.std > ./Makefile || return 1
+    make || return 1
+    make DESTDIR=$startdir/pkg install || return 1
+# scores file writable for all users
+  chown root:users "${pkgdir}/usr/lib/$pkgname/apex" || return 1
+  chmod 774 "${pkgdir}/usr/lib/$pkgname/apex" || return 1
+  touch "${pkgdir}/usr/lib/$pkgname/apex/scores.raw" || return 1
+  chown root:users "${pkgdir}/usr/lib/$pkgname/apex/scores.raw" || return 1
+  chmod 664 "${pkgdir}/usr/lib/$pkgname/apex/scores.raw" || return 1
+
+# data files writable for all users
+  chmod 774 "${pkgdir}/usr/lib/$pkgname/data" || return 1
+  chown root:users "${pkgdir}/usr/lib/$pkgname/data" || return 1
+  touch ${pkgdir}/usr/lib/$pkgname/data/{ab_info,a_info,al_info,ba_info,d_info,e_info,f_info,k_info,ow_info,p_info,ra_info,re_info,r_info,set_info,s_info,st_info,tr_info,v_info,wf_info}.raw || return 1
+  chown root:users ${pkgdir}/usr/lib/$pkgname/data/* || return 1
+  chmod 664 ${pkgdir}/usr/lib/$pkgname/data/* || return 1
+
+}

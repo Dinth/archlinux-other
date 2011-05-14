@@ -1,0 +1,40 @@
+# Mantainer: Michał "Dinth" Gawroński <dinth1906@gmail.com>
+
+pkgname=corsixth-svn
+pkgver=633
+pkgrel=1
+pkgdesc="Opensource remake of famouse Theme Hospital game"
+arch=(i686 x86_64)
+url="http://code.google.com/p/corsix-th/"
+license=('LGPL')
+depends=('sdl' 'sdl_mixer' 'lua')
+makedepends=('subversion' 'cmake' 'timidity++')
+provides=('corsixth')
+conflicts=('corsixth')
+source=()
+md5sums=()
+
+_svntrunk="http://corsix-th.googlecode.com/svn/trunk/"
+_svnmod="corsix-th-read-only"
+
+build() {
+  cd ${srcdir}
+
+  if [[ -d ${_svnmod}/.svn ]]; then
+     (cd ${_svnmod} && svn up -r $pkgver)
+  else
+     svn co ${_svntrunk} --config-dir ./ -r ${pkgver} ${_svnmod}
+  fi
+
+  msg "SVN checkout done or server timeout"
+  msg "Compiling..."
+  
+  cd corsix-th-read-only
+  cmake . || return 1
+  cd CorsixTH
+  make || return 1
+  cp ${srcdir}/corsix-th-read-only/CorsixTH/config.sample.txt ${srcdir}/corsix-th-read-only/CorsixTH/config.txt
+  make DESTDIR="$pkgdir" install || return 1
+  
+  
+}

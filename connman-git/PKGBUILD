@@ -1,0 +1,92 @@
+# Maintainer: Michal Gawronski <dinth1906@gmail.com>
+
+pkgname=connman-git
+pkgver=20100701
+pkgrel=1
+pkgdesc="Wireless LAN network manager"
+arch=('i686' 'x86_64')
+url="http://connman.net"
+license=('GPL2')
+depends=('udev' 'dbus-core')
+makedepends=('dhclient' 'bluez' 'wpa_supplicant')
+optdepends=('bluez: Support for Bluetooth devices'
+            'wpa_supplicant: For WiFi devices'
+            'dhclient: For DHCP support')
+options=('!libtool')
+conflicts=('connman')
+replaces=('connman')
+provides=('connman')
+source=('connmand-daemon'
+	'allow_group_network.diff')
+md5sums=('eaee4e875ae9a25c9f1d3cc0496566aa'
+         '78d1febc52f66d03b4970c64509c9318')
+         
+_gitroot=git://git.kernel.org/pub/scm/network/connman/connman.git
+_gitname=connman
+build() {
+    # Build and install
+
+    cd $srcdir
+    if [ -d ${_gitname} ]; then
+    	cd ${_gitname} && git pull origin
+	msg "The local files are updated."
+    else
+    	git clone ${_gitroot}
+    fi
+    msg "GIT checkout done or server timeout"
+    msg "Starting make..."
+    cd $srcdir/connman
+
+#  ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+#<------>--enable-ethernet\
+#<------>--enable-wifi\
+#<------>--enable-bluetooth\
+#<------>--enable-dhclient\
+#<------>--enable-dnsproxy\
+#<------>--enable-resolvconf\
+#<------>--enable-loopback\
+#<------>--enable-udev
+
+  if [ -f config.status ]; then
+    make maintainer-clean
+  fi
+
+  if [ ! -f doc/gtk-doc.make ]; then
+    gtkdocize --copy --docdir doc
+  fi
+
+  ./bootstrap && \
+  ./configure --enable-maintainer-mode \
+    --prefix=/usr \
+    --mandir=/usr/share/man \
+    --localstatedir=/var \
+    --sysconfdir=/etc \
+    --disable-datafiles \
+    --enable-loopback=builtin \
+    --enable-ethernet=builtin \
+    --enable-wifi=builtin \
+    --enable-bluetooth=builtin \
+    --enable-ofono=builtin \
+    --enable-udhcp=builtin \
+    --enable-dhclient=builtin \
+    --enable-openconnect=builtin \
+    --enable-resolvconf=builtin \
+    --enable-dnsproxy=builtin \
+    --enable-google=builtin \
+    --enable-portal=builtin \
+    --enable-iospm \
+    --enable-polkit=no \
+    --enable-client \
+    --enable-tools $*
+ 
+  patch -Np1 -i ${srcdir}/allow_group_network.diff || return 1
+  
+  make  || return 1
+  make DESTDIR=${pkgdir} install || return 1
+
+  install -Dm755 $srcdir/connmand-daemon $pkgdir/etc/rc.d/connmand
+  
+  # connman currently doesn't work with polkit which is in repositories
+  #   install -Dm755 ${srcdir}/${pkgname}-${pkgver}/plugins/polkit.policy ${pkgdir}/usr/share/polkit-1/actions/org.moblin.connman.policy  || return 1
+  
+}

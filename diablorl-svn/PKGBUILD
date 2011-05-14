@@ -1,0 +1,35 @@
+# Mantainer: Michał "Dinth" Gawroński <dinth1906@gmail.com>
+# Based on William Diaz and Georgij Kondratjev work.
+
+pkgname=diablorl-svn
+pkgver=252
+pkgrel=1
+pkgdesc="Roguelike clone of fameous Diablo PC game"
+arch=(i686 x86_64)
+url="http://diablo.chaosforge.org/"
+license=('LGPL')
+depends=()
+makedepends=('svn')
+provides=('diablorl')
+conflicts=('diablorl')
+source=()
+md5sums=()
+
+_svntrunk="https://diablorl.svn.sourceforge.net/svnroot/diablorl/trunk/"
+_svnmod="diablorl"
+
+build() {
+  cd ${srcdir}
+
+  if [[ -d ${_svnmod}/.svn ]]; then
+     (cd ${_svnmod} && svn up -r $pkgver)
+  else
+     svn co ${_svntrunk} --config-dir ./ -r ${pkgver} ${_svnmod}
+  fi
+
+  msg "SVN checkout done or server timeout"
+  msg "Compiling..."
+  
+  cd $pkgname
+  
+}

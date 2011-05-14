@@ -1,0 +1,38 @@
+# Maintainer: Michal Gawronski <dinth1906@gmail.com>
+
+pkgname=ctp2-apolyton-svn
+pkgver=1087
+pkgrel=1
+pkgdesc="Activisions Civilization: Call To Power II source port - Apolyton Edition - SVN version"
+arch=('i686' 'x86_64')
+url="http://apolyton.net/ctp2/"
+license=('shared-source')
+depends=('byacc-noconflict')
+makedepends=()
+provides=()
+conflicts=()
+source=()
+md5sums=()
+
+_svntrunk="http://ctp2.darkdust.net/anonsvn/branches/linux"
+_svnmod="svnwc.ctp2"
+
+
+build() {
+  cd $srcdir
+
+  if [[ -d ${_svnmod}/.svn ]]; then
+     (cd ${_svnmod} && svn up -r $pkgver)
+  else
+     svn co ${_svntrunk} --config-dir ./ -r ${pkgver} ${_svnmod}
+  fi
+
+  msg "SVN checkout done or server timeout"
+  msg "Compiling..."
+
+  cd ${_svnmod}
+
+  ./autogen.sh
+  ./configure --prefix=/usr
+  make
+}

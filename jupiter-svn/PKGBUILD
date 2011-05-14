@@ -1,0 +1,37 @@
+# Mantainer: Michał "Dinth" Gawroński <dinth1906@gmail.com>
+
+pkgname=jupiter-svn
+pkgver=112
+pkgrel=1
+pkgdesc="Simple, easy to use hardware and power management applet for all linux laptops, and netbooks"
+arch=(i686 x86_64)
+url="http://code.google.com/p/corsix-th/"
+license=('LGPL')
+depends=()
+makedepends=('subversion')
+provides=('jupiter')
+conflicts=('jupiter')
+source=()
+md5sums=()
+
+_svntrunk="https://jupiter.svn.sourceforge.net/svnroot/jupiter"
+_svnmod="jupiter"
+
+build() {
+  cd ${srcdir}
+
+  if [[ -d ${_svnmod}/.svn ]]; then
+     (cd ${_svnmod} && svn up -r $pkgver)
+  else
+     svn co ${_svntrunk} --config-dir ./ -r ${pkgver} ${_svnmod}
+  fi
+
+  msg "SVN checkout done or server timeout"
+  msg "Compiling..."
+  
+  cd jupiter
+  make || return 1
+  make DESTDIR="$pkgdir" install || return 1
+  
+  
+}

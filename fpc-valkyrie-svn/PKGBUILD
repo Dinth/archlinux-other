@@ -1,0 +1,35 @@
+# Mantainer: Michał "Dinth" Gawroński <dinth1906@gmail.com>
+# Based on William Diaz and Georgij Kondratjev work.
+
+pkgname=fpc-valkyrie-svn
+pkgver=70
+pkgrel=1
+pkgdesc="Kornel Kisielewicz roguelike library designed for Genrogue."
+arch=(i686 x86_64)
+url="http://diablo.chaosforge.org/"
+license=('LGPL')
+depends=()
+makedepends=('svn')
+provides=('diablorl')
+conflicts=('diablorl')
+source=()
+md5sums=()
+
+_svntrunk="https://fpcvalkyrie.svn.sourceforge.net/svnroot/fpcvalkyrie/trunk/"
+_svnmod="fpcvalkyrie"
+
+build() {
+  cd ${srcdir}
+
+  if [[ -d ${_svnmod}/.svn ]]; then
+     (cd ${_svnmod} && svn up -r $pkgver)
+  else
+     svn co ${_svntrunk} --config-dir ./ -r ${pkgver} ${_svnmod}
+  fi
+
+  msg "SVN checkout done or server timeout"
+  msg "Compiling..."
+  
+  cd $pkgname
+  
+}
